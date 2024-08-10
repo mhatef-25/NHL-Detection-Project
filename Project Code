@@ -1,0 +1,43 @@
+from google.colab import drive
+
+# Mount Google Drive
+drive.mount('/content/gdrive')
+
+# List contents of Google Drive to verify the dataset
+!ls '/content/gdrive/My Drive'
+
+# Set the dataset directory
+DATA_DIR = '/content/gdrive/My Drive/dataset/'
+
+# Install the Ultralytics YOLOv8 package
+!pip install ultralytics
+
+# Import YOLO from ultralytics
+from ultralytics import YOLO
+
+# Load a pre-trained model
+model = YOLO("yolov8n-cls.pt")
+
+# Train the model with augmentations
+results = model.train(
+    data=DATA_DIR,
+    epochs=50,
+    imgsz=64,
+    batch=16,
+    augment=True,          # Enable data augmentation
+    flipud=0.1,            # Random vertical flip (0.1 probability)
+    fliplr=0.5,            # Random horizontal flip (0.5 probability)
+    hsv_h=0.015,           # HSV-Hue augmentation (±1.5%)
+    hsv_s=0.7,             # HSV-Saturation augmentation (±70%)
+    hsv_v=0.4,             # HSV-Value augmentation (±40%)
+    translate=0.1,         # Random translation (±10% of image size)
+    scale=0.5,             # Random scaling (±50%)
+    shear=0.1,             # Random shear (±10 degrees)
+    perspective=0.0,       # Perspective warping (disabled here)
+    mixup=0.0,             # MixUp augmentation (disabled here)
+    mosaic=1.0,            # Enable mosaic augmentation
+    copy_paste=0.0,        # Copy-paste augmentation (disabled here)
+    auto_augment="randaugment",  # Randomly selected augmentations
+    erasing=0.4            # Randomly erase parts of the image
+)
+!cp -r /content/runs '/content/gdrive/My Drive/dataset/'
