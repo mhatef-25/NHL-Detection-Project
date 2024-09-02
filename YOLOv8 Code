@@ -1,0 +1,38 @@
+# Import required libraries
+!pip install ultralytics
+from google.colab import drive
+from ultralytics import YOLO
+import cv2
+import matplotlib.pyplot as plt
+
+# Mount Google Drive
+drive.mount('/content/gdrive')
+
+# Set the dataset directory
+DATA_DIR = '/content/gdrive/MyDrive/research/'
+
+# Load the pre-trained YOLOv8 model for binary classification (FL vs SLL)
+model = YOLO("yolov8n-cls.pt")
+
+# Train the YOLO model with refined settings and augmentations
+results = model.train(
+    data=DATA_DIR,
+    epochs=100,
+    imgsz=640,
+    batch=16,
+    augment=True,
+    flipud=0.1,          # Slight vertical flip probability to maintain natural orientation
+    fliplr=0.5,          # Standard horizontal flip probability
+    hsv_h=0.015,         # Subtle hue adjustment for color variation
+    hsv_s=0.5,           # Moderate saturation change
+    hsv_v=0.4,           # Slight brightness variation
+    translate=0.1,       # Small translation to reduce overfitting
+    scale=0.3,           # Moderate scaling to simulate different distances
+    shear=0.1,           # Minimal shearing to prevent distortion
+    perspective=0.0,     # No perspective distortion for image integrity
+    mixup=0.2,           # Slightly increased mixup for synthetic data creation
+    mosaic=0.5,          # Reduced mosaic to focus on realistic images
+    copy_paste=0.0,      # No copy-paste augmentation to avoid artifacts
+    auto_augment="randaugment",  # Apply a randomized auto-augmentation policy
+    erasing=0.3          # Controlled erasing to focus on key features
+)
