@@ -5,15 +5,9 @@ from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Dropout
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import AdamW
 from google.colab import drive
-
-# Mount Google Drive
 drive.mount('/content/gdrive')
-
-# Define image size and number of classes
 img_height, img_width = 640, 640
 num_classes = 2  # Adjust based on the number of classes in your dataset
-
-# ImageDataGenerator with the same augmentations as YOLOv8
 train_datagen = ImageDataGenerator(
     rescale=1./255,               # Normalize pixel values to [0, 1]
     validation_split=0.18,         # Split data into training and validation sets
@@ -26,19 +20,13 @@ train_datagen = ImageDataGenerator(
     height_shift_range=0.1,       # translate=0.1 (vertical translation)
     fill_mode='nearest'           # Fill mode for pixels outside the boundaries
 )
-
-# ImageDataGenerator for validation (without augmentations)
 val_datagen = ImageDataGenerator(
     rescale=1./255,               # Normalize pixel values to [0, 1]
     validation_split=0.18          # Split data into training and validation sets
 )
-
-# ImageDataGenerator for test (without augmentations)
 test_datagen = ImageDataGenerator(
     rescale=1./255                # Normalize pixel values to [0, 1]
 )
-
-# Load and preprocess the dataset
 train_generator = train_datagen.flow_from_directory(
     '/content/gdrive/My Drive/dataset/train',
     target_size=(img_height, img_width),
@@ -54,39 +42,26 @@ validation_generator = val_datagen.flow_from_directory(
     class_mode='categorical',
     subset='validation'
 )
-
 test_generator = test_datagen.flow_from_directory(
     '/content/gdrive/My Drive/dataset/test',  # Path to test data directory
     target_size=(img_height, img_width),
     batch_size=16,
     class_mode='categorical'
 )
-
-# Load the VGG16 model with pre-trained ImageNet weights
 base_model = VGG16(weights='imagenet', include_top=False, input_shape=(img_height, img_width, 3))
-
-# Add custom layers on top of VGG16
 x = base_model.output
 x = GlobalAveragePooling2D()(x)
 x = Dense(1024, activation='relu')(x)
 x = Dropout(0.5)(x)
 predictions = Dense(num_classes, activation='softmax')(x)
-
-# Create the final model
 model = Model(inputs=base_model.input, outputs=predictions)
-
-# Freeze the layers of VGG16 base model
 for layer in base_model.layers:
     layer.trainable = False
-
-# Compile the model with AdamW optimizer
 model.compile(
     optimizer=AdamW(learning_rate=0.000714, weight_decay=0.01),
     loss='categorical_crossentropy',
     metrics=['accuracy']
 )
-
-# Train the model
 history = model.fit(
     train_generator,
     steps_per_epoch=train_generator.samples // train_generator.batch_size,
@@ -94,18 +69,12 @@ history = model.fit(
     validation_steps=validation_generator.samples // validation_generator.batch_size,
     epochs=100  # Adjust epochs based on your needs
 )
-
-# Evaluate the model on the validation set
 val_loss, val_accuracy = model.evaluate(validation_generator)
 print(f'Validation Loss: {val_loss}')
 print(f'Validation Accuracy: {val_accuracy}')
-
-# Evaluate the model on the test set
 test_loss, test_accuracy = model.evaluate(test_generator)
 print(f'Test Loss: {test_loss}')
 print(f'Test Accuracy: {test_accuracy}')
-
-# Save the trained model
 model_save_path = '/content/gdrive/My Drive/dataset/vgg16_model.h5'
 model.save(model_save_path)
 print(f'Model saved to: {model_save_path}')
