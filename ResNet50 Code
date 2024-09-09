@@ -9,23 +9,23 @@ drive.mount('/content/gdrive')
 img_height, img_width = 640, 640
 num_classes = 2  # Adjust based on the number of classes in your dataset
 train_datagen = ImageDataGenerator(
-    rescale=1./255,               # Normalize pixel values to [0, 1]
-    validation_split=0.18,         # Split data into training and validation sets
-    vertical_flip=True,           # flipud=0.1 (approximated by vertical flip)
-    horizontal_flip=True,         # fliplr=0.5
-    brightness_range=[0.6, 1.4],  # hsv_v=0.4
-    shear_range=0.1,              # Shear transformation
-    zoom_range=[0.7, 1.3],        # scale=0.3
-    width_shift_range=0.1,        # translate=0.1 (horizontal translation)
-    height_shift_range=0.1,       # translate=0.1 (vertical translation)
-    fill_mode='nearest'           # Fill mode for pixels outside the boundaries
+    rescale=1./255,              
+    validation_split=0.18,        
+    vertical_flip=True,           
+    horizontal_flip=True,         
+    brightness_range=[0.6, 1.4],  
+    shear_range=0.1,              
+    zoom_range=[0.7, 1.3],        
+    width_shift_range=0.1,       
+    height_shift_range=0.1,      
+    fill_mode='nearest'           
 )
 val_datagen = ImageDataGenerator(
-    rescale=1./255,               # Normalize pixel values to [0, 1]
-    validation_split=0.18          # Split data into training and validation sets
+    rescale=1./255,              
+    validation_split=0.18          
 )
 test_datagen = ImageDataGenerator(
-    rescale=1./255                # Normalize pixel values to [0, 1]
+    rescale=1./255                
 )
 train_generator = train_datagen.flow_from_directory(
     '/content/gdrive/My Drive/dataset/train',
@@ -42,7 +42,7 @@ validation_generator = val_datagen.flow_from_directory(
     subset='validation'
 )
 test_generator = test_datagen.flow_from_directory(
-    '/content/gdrive/My Drive/dataset/test',  # Path to test data directory
+    '/content/gdrive/My Drive/dataset/test',  
     target_size=(img_height, img_width),
     batch_size=16,
     class_mode='categorical'
